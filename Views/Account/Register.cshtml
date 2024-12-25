@@ -1,0 +1,79 @@
+@model AutoFull.ViewModels.RegisterViewModel
+
+
+@{
+    ViewBag.Title = "Register";
+}
+
+<div class="row mt-5">
+    <div class="col-4 mx-auto border border-3 p-4">
+        <form asp-action="Register" enctype="multipart/form-data" class="mb-3">
+            <div asp-validation-summary="All" class="text-danger"></div>
+            <div class="mb-3">
+                <label asp-for="UserName" class="form-label">Введите имя пользователя</label>
+                <input asp-for="UserName" type="text" class="form-control" placeholder="Логин">
+                <span asp-validation-for="UserName" class="text-danger"></span>
+            </div>
+
+            <div class="mb-3">
+                <label asp-for="Email" class="form-label">Введите электроный адрес</label>
+                <input asp-for="Email" type="email" class="form-control" placeholder="Эл. адрес">
+                <span asp-validation-for="Email" class="text-danger"></span>
+            </div>
+
+            <div class="mb-3">
+                <label asp-for="PhoneNumber" class="form-label">Введите номер телефона</label>
+                <input asp-for="PhoneNumber" type="tel" class="form-control" value="+996" placeholder="Номер телефона">
+                <span asp-validation-for="PhoneNumber" class="text-danger"></span>
+            </div>
+
+            <div class="form-group mb-3">
+                <label asp-for="Avatar" class="form-label">Выберите фото</label><br />
+                <input asp-for="Avatar" type="file" class="control-control" accept="image/*">
+                <span asp-validation-for="Avatar" class="text-danger"></span>
+            </div>
+
+            <div class="mb-3">
+                <label asp-for="Password" class="form-label">Введите пароль</label>
+                <input id="password" asp-for="Password" type="password" class="form-control" placeholder="Пароль">
+                <span toggle="#password" class="fa fa-fw fa-eye field-icon toggle-password"></span>
+                <span asp-validation-for="Password" class="text-danger"></span>
+            </div>
+
+            <div class="mb-3">
+                <label asp-for="ConfirmPassword" class="form-label">Подвердите пароль</label>
+                <input id="confirmPassword" asp-for="ConfirmPassword" type="password" class="form-control" placeholder="Подтвердить пароль">
+                <span toggle="#confirmPassword" class="fa fa-fw fa-eye field-icon toggle-password"></span>
+                <span asp-validation-for="ConfirmPassword" class="text-danger"></span>
+            </div>
+            
+            <div class="mb-3">
+                <input type="submit" class="form-control btn btn-primary" value="Регистрация">
+            </div>
+        </form>
+
+        <div class="border border-2 text-center p-3">
+            <p>Есть аккаунт ? <a asp-action="Register" class="text-decoration-none">Вход</a></p>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    @{ await Html.RenderPartialAsync("_ValidationScriptsPartial"); }
+
+    <script>
+        $(document).ready(function(){
+            $('.toggle-password').click(function(){
+            
+                $(this).toggleClass('fa-eye fa-eye-slash');
+                var input = $($(this).attr('toggle'));
+                
+                if (input.attr('type') === 'password'){
+                input.attr('type', 'text');
+                }else{
+                    input.attr('type', 'password');
+                }
+            });
+        });
+    </script>
+}
