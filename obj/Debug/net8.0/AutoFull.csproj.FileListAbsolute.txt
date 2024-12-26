@@ -321,3 +321,4 @@ C:\Users\e.yksanov\RiderProjects\AutoFull\AutoFull\bin\Debug\net8.0\runtimes\win
 C:\Users\e.yksanov\RiderProjects\AutoFull\AutoFull\bin\Debug\net8.0\Castle.Core.dll
 C:\Users\e.yksanov\RiderProjects\AutoFull\AutoFull\bin\Debug\net8.0\Moq.dll
 C:\Users\e.yksanov\RiderProjects\AutoFull\AutoFull\bin\Debug\net8.0\Moq.EntityFrameworkCore.dll
+C:\Users\e.yksanov\RiderProjects\AutoFull\AutoFull\obj\Debug\net8.0\AutoFull.sourcelink.json

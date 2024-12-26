@@ -1,4 +1,4 @@
-@model AutoFull.Models.Marca
+@model AutoFull.ViewModels.MarcaViewModel
 
 @{
     ViewData["Title"] = "Details";
@@ -12,32 +12,32 @@
     <hr />
     <dl class="row">
         <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.Name)
+            @Html.DisplayNameFor(model => model.MarcasDetais.Name)
         </dt>
         <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.Name)
+            @Html.DisplayFor(model => model.MarcasDetais.Name)
         </dd>
         <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.Model)
+            @Html.DisplayNameFor(model => model.MarcasDetais.Model)
         </dt>
         <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.Model)
+            @Html.DisplayFor(model => model.MarcasDetais.Model)
         </dd>
         <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.Description)
+            @Html.DisplayNameFor(model => model.MarcasDetais.Description)
         </dt>
         <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.Description)
+            @Html.DisplayFor(model => model.MarcasDetais.Description)
         </dd>
         <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.PathToPhoto)
+            @Html.DisplayNameFor(model => model.MarcasDetais.PathToPhoto)
         </dt>
         <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.PathToPhoto)
+            @Html.DisplayFor(model => model.MarcasDetais.PathToPhoto)
         </dd>
     </dl>
 </div>
 <div>
-    <a asp-action="Edit" asp-route-id="@Model?.Id">Edit</a> |
+    <a asp-action="Edit" asp-route-id="@Model?.MarcasDetais.Id">Edit</a> |
     <a asp-action="Index">Back to List</a>
 </div>

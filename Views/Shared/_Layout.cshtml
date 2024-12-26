@@ -42,6 +42,14 @@
             <ul class="navbar-nav flex-grow-1 d-flex justify-content-end">
                 @if (User.Identity.IsAuthenticated)
                 {
+                    <div class="col-6">
+                        <div class="container-fluid">
+                            <form class="d-flex" role="search">
+                                <input id="searchId" class="form-control me-2" type="search" placeholder="live search..." aria-label="search">
+                            </form>
+                        </div>
+                    </div>
+                    
                     <li class="nav-item">
                         <div class="dropstart mx-3">
 

@@ -1,62 +1,53 @@
-@model IEnumerable<AutoFull.Models.Marca>
+@model AutoFull.ViewModels.IndexViewModel
 
-<div class="col-6 pb-5">
-    <div class="container-fluid">
-        <form class="d-flex" role="search">
-            <input id="searchId" class="form-control me-2" type="search" placeholder="live search..." aria-label="search">
-        </form>
-    </div>
-</div>
 
-<p>
-    <a asp-action="Create">Create New</a>
-</p>
-
-<table class="table">
-    <thead>
-    <tr>
-        <th>@Html.DisplayNameFor(model => model.Name)</th>
-        <th>@Html.DisplayNameFor(model => model.Model)</th>
-        <th>@Html.DisplayNameFor(model => model.Description)</th>
-        <th>@Html.DisplayNameFor(model => model.PathToPhoto)</th>
-        <th></th>
-    </tr>
-    </thead>
-    <tbody id="marcaTableBody">
-    @foreach (var item in Model)
-    {
-        <tr>
-            <td>@Html.DisplayFor(modelItem => item.Name)</td>
-            <td>@Html.DisplayFor(modelItem => item.Model)</td>
-            <td>@Html.DisplayFor(modelItem => item.Description)</td>
-            <td>@Html.DisplayFor(modelItem => item.PathToPhoto)</td>
-            <td>
-                <a asp-action="Edit" asp-route-id="@item.Id">Edit</a> |
-                <a asp-action="Details" asp-route-id="@item.Id">Details</a> |
-                <a asp-action="Delete" asp-route-id="@item.Id">Delete</a>
-            </td>
-        </tr>
+<div id="indexBlock">
+    @{
+        await Html.RenderPartialAsync("_IndexPartialView", Model);
     }
-    </tbody>
-</table>
+</div>
 
 @section Scripts {
     <script>
-        $(document).ready(function () {
-            $("#searchId").on("input", function () {
-                const searchQuery = $(this).val();
-                $.ajax({
-                    url: '@Url.Action("Index", "Marca")',
-                    type: 'GET',
-                    data: { search: searchQuery },
-                    success: function (result) {
-                        $("tbody#marcaTableBody").html($(result).find('tbody#marcaTableBody').html());
-                    },
-                    error: function () {
-                        console.log("Ошибка при загрузке данных.");
-                    }
-                });
+        let searchInput = $('#searchId'); 
+        let indexBlock = $('#indexBlock');
+        let page = 1;
+        let search = "";
+
+        function getData() {
+            $.ajax({
+                url: '@Url.Action("Index", "Marca")',
+                type: 'GET',
+                data: {
+                    'search': search,
+                    'page': page
+                },
+                success: function (response) {
+                    indexBlock.html($(response).find("#indexBlock").html());
+                },
+                error: function () {
+                    console.error("Ошибка при загрузке данных.");
+                }
             });
+        }
+
+        searchInput.on("input", function () {
+            page = 1;
+            search = searchInput.val();
+            getData();
+        });
+
+        function changePage(nextPage) {
+            page = nextPage;
+            getData();
+        }
+
+        $(document).on("click", ".pagination .page-link", function (event) {
+            event.preventDefault();
+            let nextPage = $(this).data('page');
+            if (nextPage !== page) {
+                changePage(nextPage);
+            }
         });
     </script>
 }

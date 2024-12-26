@@ -1,6 +1,7 @@
 using Microsoft.AspNetCore.Mvc;
 using AutoFull.Models;
 using AutoFull.Repositories;
+using AutoFull.ViewModels;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
@@ -22,11 +23,20 @@ namespace AutoFull.Controllers
             _userManager = userManager;
         }
 
-        public async Task<IActionResult> Index(string search = "")
+        public async Task<IActionResult> Index(string search = "", int page = 1)
         {
             var marcas = string.IsNullOrWhiteSpace(search) ? await _context.Marcas.ToListAsync() : await _context.Marcas.Where(m => m.Name.ToLower().Contains(search) || m.Description.ToLower().Contains(search)).ToListAsync();
             
-            return View(marcas);
+            int pageSize = 4;
+            int marcaCount = marcas.Count();
+            List<Marca> marcaList = marcas.Skip((page - 1) * pageSize).Take(pageSize).ToList();
+
+            IndexViewModel vm = new IndexViewModel()
+            {
+                Marcas = marcaList,
+                PageViewModel = new PageViewModel(marcaCount, page, pageSize),
+            };
+            return View(vm);
         }
 
         public async Task<IActionResult> GetUsers(int? id)
@@ -63,7 +73,15 @@ namespace AutoFull.Controllers
                 return NotFound();
             }
 
-            return View(marca);
+            MyUser user = await _userManager.GetUserAsync(User);
+
+            return View(new MarcaViewModel
+            {
+                CurrentUser = user,
+                MarcasDetais = marca
+            });
+
+            //return View(marca);
         }
         
         //GET: Marca/Create
