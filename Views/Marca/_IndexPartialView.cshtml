@@ -9,6 +9,31 @@
                 <div class="card-body ps-0 pb-0">
                     <a asp-action="Details" asp-controller="Marca" asp-route-id="@m.Id" style="text-decoration: none"><h6 class="text-center">@m.Name</h6></a>
                 </div>
+
+                <div class="rating mb-2">
+                    @for (int i = 1; i <= 5; i++)
+                    {
+                    if (i <= m.AverageRating)
+                    {
+                    <i class="fa-solid fa-star" style="color: #FFD43B;"></i>
+                    }
+                    else if (i - m.AverageRating < 1)
+                    {
+                    <i class="fa-solid fa-star-half-stroke" style="color: #FFD43B;"></i>
+                    }
+                    else
+                    {
+                    <i class="fa-regular fa-star"></i>
+                    }
+                    }
+                </div>
+                <p class="mb-2">(@m.AverageRating, @ViewBag.FeedbackCount отзывов)</p>
+
+                <div>
+                    <i class="fa-solid fa-camera"></i>
+                    <span>@m.Feedbacks.Count фотографий</span>
+                </div>
+                
             </div>
         </div>
     }

@@ -1,43 +1,140 @@
-@model AutoFull.ViewModels.MarcaViewModel
+    @model AutoFull.ViewModels.MarcaViewModel
 
 @{
     ViewData["Title"] = "Details";
     Layout = "~/Views/Shared/_Layout.cshtml";
 }
 
-<h1>Details</h1>
+<div class="row mt-5">
+    <div class="col-8 mx-auto">
+        <div class="row">
+            <div class="col-5">
+                <h1 class="mb-3">@Model.MarcasDetais.Name</h1>
+                <p class="text-break text-wrap">@Model.MarcasDetais.Description</p>
+            </div>
 
-<div>
-    <h4>Marca</h4>
-    <hr />
-    <dl class="row">
-        <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.MarcasDetais.Name)
-        </dt>
-        <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.MarcasDetais.Name)
-        </dd>
-        <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.MarcasDetais.Model)
-        </dt>
-        <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.MarcasDetais.Model)
-        </dd>
-        <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.MarcasDetais.Description)
-        </dt>
-        <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.MarcasDetais.Description)
-        </dd>
-        <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.MarcasDetais.PathToPhoto)
-        </dt>
-        <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.MarcasDetais.PathToPhoto)
-        </dd>
-    </dl>
+            <div class="col-7">
+                <img src="@Model.MarcasDetais.PathToPhoto" alt="Main Photo" class="img-fluid rounded-3">
+            </div>
+        </div>
+        
+        @if (User.IsInRole("admin"))
+        {
+            <h3 class="mb-3">Действия</h3>
+            <div class="d-flex">
+                <a class="btn btn-danger me-3" asp-action="Delete" asp-controller="Marca" asp-route-id="@Model.MarcasDetais.Id">Удалить</a>
+                <a class="btn btn-warning" asp-action="Edit" asp-controller="Marca" asp-route-id="@Model.MarcasDetais.Id">Редактировать</a>
+            </div>
+        }
+
+        <div class="border-bottom mb-3">
+            <h4>
+                Рейтинг
+
+                @{
+                    int mantissa = (int)Model.MarcasDetais.AverageRating;
+                    int countOfFraction = ((Model.MarcasDetais.AverageRating * 10) % 10) > 0 ? 1 : 0;
+
+                    for (int i = 0; i < 5; i++)
+                    {
+                        if (mantissa > 0)
+                        {
+                            @: <i class="bi bi-star-fill text-warning"></i>
+                            mantissa--;
+                        }
+                        else
+                        {
+                            if (countOfFraction > 0)
+                            {
+                                @: <i class="bi bi-star-half text-warning"></i>
+                                countOfFraction--;
+                            }
+                            else
+                            {
+                                @: <i class="bi bi-star text-warning"></i>
+                            }
+                        }
+                    }
+                }
+
+                @Model.MarcasDetais.AverageRating
+            </h4>
+        </div>
+
+        <h3>Отзывы</h3>
+        <div id="feedbacksBlock" class="mb-3">
+            @{
+                await Html.RenderPartialAsync("_FeedbacksPartialView", Model);
+            }
+        </div>
+
+        @if (User.Identity.IsAuthenticated)
+        {
+            <div class="p-3 border rounded-2 bg-light">
+                <h5 class="mb-3">Добавить фото заведения</h5>
+                <form id="addPhotoForm" enctype="multipart/form-data">
+                    <input id="establishmentId" type="hidden" name="establishmentId" value="@Model.MarcasDetais.Id">
+                    <input name="newPhoto" id="fileInput" class="form-control mb-3" type="file" accept="image/*" required/>
+                    <input type="submit" class="btn btn-outline-primary" value="Загрузить фото">
+                </form>
+            </div>
+        }
+
+    </div>
 </div>
-<div>
-    <a asp-action="Edit" asp-route-id="@Model?.MarcasDetais.Id">Edit</a> |
-    <a asp-action="Index">Back to List</a>
-</div>
+
+@section Scripts {
+    <script>
+        let addPhotoForm = $('#addPhotoForm');
+        let galleryBlock = $('#galleryBlock');
+        let feedbacksBlock = $('#feedbacksBlock');
+        let addFeedbackForm = $('#addFeedbackForm');
+        let feedbackErrorMsg = $('#feedbackErrorMsg');
+
+        addFeedbackForm.submit(function (event) {
+            event.preventDefault();
+            let rating = 0;
+            let stars = $('.star');
+            
+            stars.each(function () {
+               if ($(this).hasClass('bi-star-fill')) {
+                    rating++;
+                } 
+            });
+            
+            if (rating > 0) {
+                $.ajax({
+                    url: '@Url.Action("AddFeedback", "Marca")',
+                    type: 'POST',
+                    data: {
+                        marcaId : '@Model.MarcasDetais.Id',
+                        feedbackText : $('#feedbackTextInp').val(),
+                        rating : rating
+                    },
+                    success: function (response) {
+                        feedbacksBlock.html(response);
+                        $('#feedbackTextInp').val('');
+                        fillStar(0);
+                    }
+                });
+            }
+            else {
+                feedbackErrorMsg.text('Введите оценку');
+            }
+        });
+        
+                
+        function fillStar(count) {
+            let stars = $('.star');
+            feedbackErrorMsg.empty();
+
+            stars.each(function () {
+                $(this).removeClass('bi-star-fill').addClass('bi-star').removeClass('text-warning');
+            });
+            
+            stars.slice(0, count).each(function () {
+                $(this).removeClass('bi-star').addClass('bi-star-fill').addClass('text-warning');
+            });
+        }
+    </script>
+}

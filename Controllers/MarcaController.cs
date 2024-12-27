@@ -5,7 +5,6 @@ using AutoFull.ViewModels;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
-using Moq;
 
 namespace AutoFull.Controllers
 {
@@ -45,8 +44,8 @@ namespace AutoFull.Controllers
             {
                 return BadRequest();
             }
-
-            MyUser user = _userRepository.GetById(id.Value);
+            
+            var user = await _userRepository.GetUserAsync(User);
 
             if (user == null)
             {
@@ -187,6 +186,84 @@ namespace AutoFull.Controllers
         private bool MarcaExists(int id)
         {
             return _context.Marcas.Any(e => e.Id == id);
+        }
+        
+        //---------------------------------------------------
+
+            [HttpPost]
+            public async Task<IActionResult> AddFeedback(int marcaId, string feedbackText, int rating)
+            {
+                Marca? marca = await _context.Marcas
+                    .Include(a => a.Autos)
+                    .Include(e => e.Feedbacks)
+                    .ThenInclude(u => u.User)
+                    .FirstOrDefaultAsync(m => m.Id == marcaId);
+                
+                if (marca == null)
+                {
+                    return NotFound();
+                }
+                
+                if (string.IsNullOrWhiteSpace(feedbackText) || rating <= 0 || rating > 5)
+                {
+                    Console.WriteLine("Некорректные данные: feedbackText=" + feedbackText + ", rating=" + rating);
+                    return BadRequest("Некорректные данные");
+                }
+
+                MyUser user = await _userRepository.GetUserAsync(User);
+
+                if ((await _context.Feedbacks.Include(u =>  u.User).AnyAsync(f => f.UserId == user.Id && f.MarcaId == marca.Id)))
+                {
+                    return BadRequest();
+                }
+                
+                Feedback feedback = new Feedback
+                {
+                    Rating = rating,
+                    Text = feedbackText,
+                    CreationDate = DateTime.UtcNow,
+                    MarcaId = marcaId,
+                    UserId = user.Id
+                };
+
+                await _context.Feedbacks.AddAsync(feedback);
+                Console.WriteLine("Отзыв добавлен: " + feedbackText); // Лог для проверки
+                await _context.SaveChangesAsync();
+
+                
+
+                return PartialView("_FeedbacksPartialView", new MarcaViewModel()
+                {
+                    CurrentUser = user,
+                    MarcasDetais = marca
+                });
+            }
+
+        public async Task<IActionResult> DeleteFeedback(int marcaId)
+        {
+            Marca? marca =  await _context.Marcas
+                .Include(e => e.Feedbacks)
+                .ThenInclude(u => u.User)
+                .FirstOrDefaultAsync(m => m.Id == marcaId);
+            
+            if (marca == null)
+            {
+                return NotFound("Страница не найдено");
+            }
+            
+            MyUser user = await _userRepository.GetUserAsync(User);
+
+            Feedback? feedback = (await _context.Feedbacks.Include(f => f.User).FirstOrDefaultAsync(f => f.MarcaId == marcaId && f.UserId == user.Id));
+
+            if (feedback == null)
+            {
+                return NotFound();
+            }
+
+            _context.Feedbacks.Remove(feedback);
+            await _context.SaveChangesAsync();
+
+            return RedirectToAction("Details", new {id = marca.Id});
         }
     }
 }

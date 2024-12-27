@@ -28,3 +28,10 @@ body {
   position: relative;
   z-index: 2;
 }
+
+.search-bi{
+  position: relative;
+    z-index: 2;
+    display: inline-block;
+  padding-right: 8rem;
+}

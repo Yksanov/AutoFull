@@ -112,6 +112,39 @@ namespace AutoFull.Migrations
                     b.ToTable("CartAutos");
                 });
 
+            modelBuilder.Entity("AutoFull.Models.Feedback", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("integer");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
+
+                    b.Property<DateTime>("CreationDate")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<int>("MarcaId")
+                        .HasColumnType("integer");
+
+                    b.Property<int>("Rating")
+                        .HasColumnType("integer");
+
+                    b.Property<string>("Text")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<int>("UserId")
+                        .HasColumnType("integer");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("MarcaId");
+
+                    b.HasIndex("UserId");
+
+                    b.ToTable("Feedbacks");
+                });
+
             modelBuilder.Entity("AutoFull.Models.Marca", b =>
                 {
                     b.Property<int>("Id")
@@ -394,7 +427,7 @@ namespace AutoFull.Migrations
             modelBuilder.Entity("AutoFull.Models.Auto", b =>
                 {
                     b.HasOne("AutoFull.Models.Marca", "Marca")
-                        .WithMany()
+                        .WithMany("Autos")
                         .HasForeignKey("MarcaId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
@@ -409,7 +442,7 @@ namespace AutoFull.Migrations
             modelBuilder.Entity("AutoFull.Models.Cart", b =>
                 {
                     b.HasOne("AutoFull.Models.Marca", "Marca")
-                        .WithMany()
+                        .WithMany("Carts")
                         .HasForeignKey("MarcaId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
@@ -442,6 +475,25 @@ namespace AutoFull.Migrations
                     b.Navigation("Auto");
 
                     b.Navigation("Cart");
+                });
+
+            modelBuilder.Entity("AutoFull.Models.Feedback", b =>
+                {
+                    b.HasOne("AutoFull.Models.Marca", "Marca")
+                        .WithMany("Feedbacks")
+                        .HasForeignKey("MarcaId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("AutoFull.Models.MyUser", "User")
+                        .WithMany()
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Marca");
+
+                    b.Navigation("User");
                 });
 
             modelBuilder.Entity("AutoFull.Models.Order", b =>
@@ -517,6 +569,15 @@ namespace AutoFull.Migrations
             modelBuilder.Entity("AutoFull.Models.Cart", b =>
                 {
                     b.Navigation("CartAutos");
+                });
+
+            modelBuilder.Entity("AutoFull.Models.Marca", b =>
+                {
+                    b.Navigation("Autos");
+
+                    b.Navigation("Carts");
+
+                    b.Navigation("Feedbacks");
                 });
 
             modelBuilder.Entity("AutoFull.Models.Order", b =>

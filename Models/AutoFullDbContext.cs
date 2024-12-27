@@ -12,6 +12,7 @@ public class AutoFullDbContext : IdentityDbContext<MyUser, IdentityRole<int>, in
     public DbSet<Cart> Carts { get; set; }
     public DbSet<CartAuto> CartAutos { get; set; }
     public DbSet<Order> Orders { get; set; }
+    public DbSet<Feedback> Feedbacks { get; set; }
     
     public AutoFullDbContext(DbContextOptions<AutoFullDbContext> options) : base(options) {}
 }
