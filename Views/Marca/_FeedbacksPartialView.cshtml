@@ -1,0 +1,69 @@
+@model AutoFull.ViewModels.MarcaViewModel
+
+<div class="border-bottom mb-3">
+    @foreach (Feedback feedback in Model.MarcasDetais.Feedbacks)
+    {
+        <div class="p-3 border mb-3 rounded-2 bg-light">
+            <p>@feedback.CreationDate.ToString("d.MM.yyyy HH:mm"), <a asp-action="Profile" asp-controller="User">@feedback.User.UserName</a></p>
+            <p>@feedback.Text</p>
+            <div>
+                @{
+                    int mantissa = feedback.Rating;
+                        
+                    for (int i = 0; i < 5; i++)
+                    {
+                        if (mantissa > 0)
+                        {
+                            <i class="bi bi-star-fill text-warning"></i>
+                            mantissa--;
+                        }
+                        else
+                        {
+                            <i class="bi bi-star text-warning"></i>
+                        }
+                    }
+                }
+            </div>
+        </div>
+    }
+</div>
+
+@if (User.Identity.IsAuthenticated)
+{
+    <div class="p-3 mb-3 border rounded-2 bg-light">
+        @if (Model.MarcasDetais.Feedbacks.Any(e => e.UserId == Model.CurrentUser.Id))
+        {
+            <h5 class="mb-3">Удалить отзыв</h5>
+            <p>У вас уже есть отзыв. Желаете удалить прошлый и добавить новый ?</p>
+            <form asp-action="DeleteFeedback" asp-controller="Marca">
+                <input type="hidden" name="establishmentId" value="@Model.MarcasDetais.Id">
+                <input type="submit" value="Удалить" class="btn btn-outline-danger">
+            </form>
+        }
+        else
+        {
+            <h5 class="mb-3">Добавить отзыв</h5>
+
+            <div class="mb-3">
+                <i onclick="fillStar(1)" style="cursor: pointer;" class="bi bi-star text-warning star"></i>
+
+                <i onclick="fillStar(2)" style="cursor: pointer;" class="bi bi-star text-warning star"></i>
+
+                <i onclick="fillStar(3)" style="cursor: pointer;" class="bi bi-star text-warning star"></i>
+
+                <i onclick="fillStar(4)" style="cursor: pointer;" class="bi bi-star text-warning star"></i>
+
+                <i onclick="fillStar(5)" style="cursor: pointer;" class="bi bi-star text-warning star"></i>
+            </div>
+
+            <span class="text-danger my-2" id="feedbackErrorMsg"></span>
+
+            <div>
+                <form id="addFeedbackForm">
+                    <textarea id="feedbackTextInp" name="feedbackText" class="form-control mb-3" cols="30" rows="5" style="resize: none;"></textarea>
+                    <input type="submit" class="btn btn-outline-primary" value="Добавить">
+                </form>
+            </div>
+        }
+    </div>
+}
