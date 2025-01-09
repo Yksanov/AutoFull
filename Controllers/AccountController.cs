@@ -1,4 +1,5 @@
 using AutoFull.Models;
+using AutoFull.Repositories;
 using AutoFull.Services;
 using AutoFull.ViewModels;
 using Microsoft.AspNetCore.Identity;
@@ -11,17 +12,17 @@ namespace AutoFull.Controllers;
 
 public class AccountController : Controller
 {
-    private readonly UserManager<MyUser> _userManager;
     private readonly SignInManager<MyUser> _signInManager;
     private readonly IWebHostEnvironment _webHostEnvironment;
     private readonly EmailService _emailService;
+    private readonly IUserRepository _userRepository;
 
-    public AccountController(UserManager<MyUser> userManager, SignInManager<MyUser> signInManager, IWebHostEnvironment webHostEnvironment, EmailService emailService)
+    public AccountController(SignInManager<MyUser> signInManager, IWebHostEnvironment webHostEnvironment, EmailService emailService, IUserRepository userRepository)
     {
-        _userManager = userManager;
         _signInManager = signInManager;
         _webHostEnvironment = webHostEnvironment;
         _emailService = emailService;
+        _userRepository = userRepository;
     }
 
 
@@ -37,10 +38,10 @@ public class AccountController : Controller
     {
         if (ModelState.IsValid)
         {
-            MyUser user = await _userManager.FindByEmailAsync(model.UserNameOrEmail);
-            if (user == null)
+            MyUser user = await _userRepository.FindByEmailAsync(model.UserNameOrEmail);
+            if (user == null && !string.IsNullOrEmpty(model.UserNameOrEmail))
             {
-                user = await _userManager.FindByNameAsync(model.UserNameOrEmail);
+                user = await _userRepository.FindByNameAsync(model.UserNameOrEmail);
             }
 
             if (user == null)
@@ -100,7 +101,7 @@ public class AccountController : Controller
                 PhoneNumber = model.PhoneNumber
             };
             
-            IdentityResult result =  await _userManager.CreateAsync(user, model.Password);
+            IdentityResult result =  await _userRepository.CreateUserAsync(user, model.Password);
             if (result.Succeeded)
             {
                 await _signInManager.SignInAsync(user, false);

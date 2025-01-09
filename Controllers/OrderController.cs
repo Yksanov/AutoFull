@@ -21,7 +21,7 @@ public class OrderController : Controller
         _emailService = emailService;
     }
 
-    [Authorize(Roles = "Admin")]
+    //[Authorize(Roles = "Admin")]
     public async Task<IActionResult> Index()
     {
         return View(await _context.Orders.Include(o => o.User).Include(o => o.Marca).ToListAsync());
@@ -47,7 +47,7 @@ public class OrderController : Controller
             UserId = user.Id,
             MarcaId = cart.MarcaId,
             TotalPrice = (double)cart.CartAutos.Sum(a => a.Auto.Price * a.Quantity),
-            //CustomerName = customerName,
+            CustomerName = customerName,
             Phone = phoneNumber,
             Address = address,
             Email = email,
